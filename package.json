@@ -1,0 +1,31 @@
+{
+  "name": "cellphones_test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./src/index.test.js",
+    
+    
+    "tc01": "node ./src/tests/search/TC01.js",
+    "tc02": "node ./src/tests/search/TC02.js",
+    "tc03": "node ./src/tests/search/TC03.js",
+    "tc04": "node ./src/tests/search/TC04.js",
+    "tc05": "node ./src/tests/search/TC05.js",
+
+    "tc21": "node ./src/tests/product-detail/TC21.js",
+    "tc22": "node ./src/tests/product-detail/TC22.js",
+
+    "tc:all": "npm run tc01 && npm run tc02 && npm run tc03 && npm run tc04 && npm run tc05 && npm run tc21 && npm run tc22"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "chai": "^6.2.2",
+    "edgedriver": "^6.3.0",
+    "mocha": "^11.7.5",
+    "selenium-webdriver": "^4.43.0"
+  }
+}
