@@ -1,5 +1,5 @@
 import { By } from 'selenium-webdriver';
-import { getBodyText, safeClick, waitForVisible } from '../utils/waits.js';
+import { getBodyText, safeClick, waitForVisible } from '../support/waits.js';
 
 export class NewsletterSection {
   constructor(driver) {

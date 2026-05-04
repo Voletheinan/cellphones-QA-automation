@@ -1,7 +1,7 @@
 import { By, Key, until } from 'selenium-webdriver';
-import { BASE_URL, DEFAULT_TIMEOUT } from '../config.js';
-import { hideCookieConsentIfPresent } from '../utils/overlays.js';
-import { safeClick, waitForVisible } from '../utils/waits.js';
+import { BASE_URL, DEFAULT_TIMEOUT } from '../config/environment.js';
+import { hideCookieConsentIfPresent } from '../support/overlays.js';
+import { safeClick, waitForVisible } from '../support/waits.js';
 
 export class HomePage {
   constructor(driver) {

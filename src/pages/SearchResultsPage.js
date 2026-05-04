@@ -1,6 +1,6 @@
 import { By, Key, until } from 'selenium-webdriver';
-import { BASE_URL, DEFAULT_TIMEOUT } from '../config.js';
-import { getBodyText, safeClick, waitForVisible } from '../utils/waits.js';
+import { BASE_URL, DEFAULT_TIMEOUT } from '../config/environment.js';
+import { getBodyText, safeClick, waitForVisible } from '../support/waits.js';
 
 function parseVndPrice(text) {
   const match = text.match(/(\d{1,3}(?:\.\d{3})+)đ/);

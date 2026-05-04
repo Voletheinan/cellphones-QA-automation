@@ -7,9 +7,10 @@ Bo test tu dong hoa cho website `https://cellphones.com.vn/` bang JavaScript, Se
 ```text
 cellphones-QA-automation/
   src/
+    config/
+      environment.js    # URL, timeout, browser settings
     pages/              # Page Object Model
-    utils/              # Driver, wait, screenshot helpers
-    config.js
+    support/            # Driver, wait, overlay, screenshot, test data helpers
   data/
     README.md           # Huong dan tao du lieu local
     account.example.json

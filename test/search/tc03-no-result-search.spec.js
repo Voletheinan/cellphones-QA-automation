@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { takeScreenshot } from '../../src/utils/screenshot.js';
+import { takeScreenshot } from '../../src/support/screenshot.js';
 import { useCellphonesTestContext } from '../helpers/setup.js';
 
 describe('TC03 - Tim kiem keyword khong ton tai', function () {

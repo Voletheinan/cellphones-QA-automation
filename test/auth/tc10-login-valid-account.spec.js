@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { takeScreenshot } from '../../src/utils/screenshot.js';
-import { getPersonalAccount } from '../../src/utils/testData.js';
+import { takeScreenshot } from '../../src/support/screenshot.js';
+import { getPersonalAccount } from '../../src/support/testData.js';
 import { useCellphonesTestContext } from '../helpers/setup.js';
 
 describe('TC10 - Dang nhap tai khoan hop le', function () {

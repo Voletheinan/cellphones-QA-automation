@@ -1,5 +1,5 @@
 import { until } from 'selenium-webdriver';
-import { DEFAULT_TIMEOUT } from '../config.js';
+import { DEFAULT_TIMEOUT } from '../config/environment.js';
 
 export async function waitForVisible(driver, locator, timeout = DEFAULT_TIMEOUT) {
   const element = await driver.wait(until.elementLocated(locator), timeout);

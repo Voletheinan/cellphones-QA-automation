@@ -1,6 +1,6 @@
 import { By, until } from 'selenium-webdriver';
-import { DEFAULT_TIMEOUT, SMEMBER_URL } from '../config.js';
-import { getBodyText, safeClick, waitForVisible } from '../utils/waits.js';
+import { DEFAULT_TIMEOUT, SMEMBER_URL } from '../config/environment.js';
+import { getBodyText, safeClick, waitForVisible } from '../support/waits.js';
 
 export class LoginPage {
   constructor(driver) {

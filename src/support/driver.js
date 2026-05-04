@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { Builder } from 'selenium-webdriver';
 import chrome from 'selenium-webdriver/chrome.js';
-import { BROWSER_CONFIG } from '../config.js';
+import { BROWSER_CONFIG } from '../config/environment.js';
 
 function findExistingPath(paths) {
   return paths.find((candidate) => candidate && fs.existsSync(candidate));

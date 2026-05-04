@@ -1,6 +1,6 @@
 import { By, until } from 'selenium-webdriver';
-import { DEFAULT_TIMEOUT } from '../config.js';
-import { safeClick, waitForVisible } from '../utils/waits.js';
+import { DEFAULT_TIMEOUT } from '../config/environment.js';
+import { safeClick, waitForVisible } from '../support/waits.js';
 
 export class ProductDetailPage {
   constructor(driver) {

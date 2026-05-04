@@ -1,5 +1,5 @@
-import { createDriver } from '../../src/utils/driver.js';
-import { takeScreenshot } from '../../src/utils/screenshot.js';
+import { createDriver } from '../../src/support/driver.js';
+import { takeScreenshot } from '../../src/support/screenshot.js';
 import { HomePage } from '../../src/pages/HomePage.js';
 import { SearchResultsPage } from '../../src/pages/SearchResultsPage.js';
 import { LoginPage } from '../../src/pages/LoginPage.js';

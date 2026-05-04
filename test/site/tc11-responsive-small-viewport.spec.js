@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { takeScreenshot } from '../../src/utils/screenshot.js';
-import { hideCookieConsentIfPresent } from '../../src/utils/overlays.js';
+import { takeScreenshot } from '../../src/support/screenshot.js';
+import { hideCookieConsentIfPresent } from '../../src/support/overlays.js';
 import { useCellphonesTestContext } from '../helpers/setup.js';
 
 const SMALL_VIEWPORT = {
