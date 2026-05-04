@@ -14,6 +14,7 @@ async function TC21() {
 
         // Bước 1: Mở trang chủ
         await homePage.open();
+        await webDriverUtil.hideCookieConsentIfPresent();
         console.log('Bước 1: Trang chủ CellphoneS đã sẵn sàng.');
 
         // Bước 2: Tìm kiếm iPhone 15

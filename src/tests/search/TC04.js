@@ -15,6 +15,7 @@ async function TC04() {
         // Bước 1: Mở trang chủ
         await homePage.open();
         console.log('Bước 1: Truy cập trang chủ thành công.');
+        await webDriverUtil.hideCookieConsentIfPresent();
 
         // Bước 2: Tìm kiếm một từ khóa bất kỳ
         const keyword = 'samsung';

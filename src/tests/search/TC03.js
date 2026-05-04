@@ -15,6 +15,7 @@ async function TC03() {
         // Bước 1: Truy cập trang chủ
         await homePage.open();
         console.log('Bước 1: Truy cập trang chủ thành công.');
+        await webDriverUtil.hideCookieConsentIfPresent();
 
         // Bước 2: Nhập từ khóa vô nghĩa và nhấn Enter
         const invalidKeyword = 'asdfghjkl12345';

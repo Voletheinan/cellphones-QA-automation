@@ -15,6 +15,9 @@
 
     "tc21": "node ./src/tests/product-detail/TC21.js",
     "tc22": "node ./src/tests/product-detail/TC22.js",
+    "tc23": "node ./src/tests/product-detail/TC23.js",
+    "tc24": "node ./src/tests/product-detail/TC24.js",
+    "tc25": "node ./src/tests/product-detail/TC25.js",
 
     "tc:all": "npm run tc01 && npm run tc02 && npm run tc03 && npm run tc04 && npm run tc05 && npm run tc21 && npm run tc22"
   },

@@ -15,6 +15,7 @@ async function TC01() {
         // Bước 1: Truy cập trang chủ
         await homePage.open();
         console.log('Bước 1: Trang chủ đã load.');
+        await webDriverUtil.hideCookieConsentIfPresent();
 
         // Bước 2: Tìm kiếm iPhone 15
         const keyword = 'iPhone 15';
