@@ -9,11 +9,11 @@ cellphones-QA-automation/
   src/
     config/
       environment.js    # URL, timeout, browser settings
+    data/
+      README.md         # Huong dan tao du lieu local
+      account.example.json
     pages/              # Page Object Model
     support/            # Driver, wait, overlay, screenshot, test data helpers
-  data/
-    README.md           # Huong dan tao du lieu local
-    account.example.json
   test/
     helpers/setup.js    # Setup Chrome, Page Object va screenshot cuoi test
     site/               # Trang chu, newsletter, responsive
@@ -66,7 +66,7 @@ npm run test:auth
 7. `test/search/tc07-sort-price.spec.js` - Sap xep `Gia thap` phai tang dan theo gia.
 8. `test/site/tc08-newsletter-validation.spec.js` - Newsletter validate email va so dien thoai khong hop le.
 9. `test/auth/tc09-login-validation.spec.js` - Dang nhap voi so dien thoai khong hop le phai hien thi validation.
-10. `test/auth/tc10-login-valid-account.spec.js` - Dang nhap bang tai khoan hop le tu `data/account.local.json` hoac bien moi truong.
+10. `test/auth/tc10-login-valid-account.spec.js` - Dang nhap bang tai khoan hop le tu `src/data/account.local.json` hoac bien moi truong.
 11. `test/site/tc11-responsive-small-viewport.spec.js` - Responsive layout viewport `200x800` khong duoc tran ngang, vuot viewport hoac chong lan header/navigation.
 12. `test/search/tc12-search-autocomplete.spec.js` - Goi y tim kiem hien thi noi dung lien quan.
 13. `test/search/tc13-search-filter-button.spec.js` - Kiem tra nut bo loc trong trang ket qua tim kiem.

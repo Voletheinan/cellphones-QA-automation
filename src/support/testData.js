@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const LOCAL_ACCOUNT_PATH = path.resolve('data/account.local.json');
+const LOCAL_ACCOUNT_PATH = path.resolve('src/data/account.local.json');
 
 function readLocalAccount() {
   if (!fs.existsSync(LOCAL_ACCOUNT_PATH)) {

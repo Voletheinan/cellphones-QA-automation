@@ -4,4 +4,4 @@ reports/
 .selenium/
 *.log
 .env
-data/account.local.json
+src/data/account.local.json

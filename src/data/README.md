@@ -7,7 +7,7 @@ Thu muc nay chua du lieu test dung cho automation.
 Khong nen dua mat khau that vao source code hoac file se nop kem bao cao. Hay tao file local theo mau:
 
 ```text
-data/account.local.json
+src/data/account.local.json
 ```
 
 Noi dung:
@@ -19,7 +19,7 @@ Noi dung:
 }
 ```
 
-File `data/account.local.json` da duoc them vao `.gitignore`, nen se khong bi day len Git. Khi can demo tren may ca nhan, helper `src/utils/testData.js` se doc file local nay.
+File `src/data/account.local.json` da duoc them vao `.gitignore`, nen se khong bi day len Git. Khi can demo tren may ca nhan, helper `src/support/testData.js` se doc file local nay.
 
 Neu khong muon dung file JSON, co the set bien moi truong:
 
