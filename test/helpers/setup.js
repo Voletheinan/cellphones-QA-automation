@@ -3,12 +3,14 @@ import { takeScreenshot } from '../../src/utils/screenshot.js';
 import { HomePage } from '../../src/pages/HomePage.js';
 import { SearchResultsPage } from '../../src/pages/SearchResultsPage.js';
 import { LoginPage } from '../../src/pages/LoginPage.js';
+import { ProductDetailPage } from '../../src/pages/ProductDetailPage.js';
 
 export function useCellphonesTestContext() {
   const context = {
     driver: null,
     homePage: null,
     loginPage: null,
+    productDetailPage: null,
     searchResultsPage: null
   };
 
@@ -16,6 +18,7 @@ export function useCellphonesTestContext() {
     context.driver = await createDriver();
     context.homePage = new HomePage(context.driver);
     context.loginPage = new LoginPage(context.driver);
+    context.productDetailPage = new ProductDetailPage(context.driver);
     context.searchResultsPage = new SearchResultsPage(context.driver);
   });
 

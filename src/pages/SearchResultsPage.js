@@ -10,7 +10,9 @@ function parseVndPrice(text) {
 export class SearchResultsPage {
   constructor(driver) {
     this.driver = driver;
-    this.searchInput = By.css('input[placeholder*="muốn mua"], input[placeholder*="Bạn muốn mua"]');
+    this.searchInput = By.css('input[data-slot="input"], input[placeholder*="muốn mua"], input[placeholder*="Bạn muốn mua"]');
+    this.productList = By.css('.product-list-filter');
+    this.productTitles = By.css('.product-list-filter h3');
   }
 
   async openWithQuery(query) {
@@ -95,5 +97,89 @@ export class SearchResultsPage {
     }
 
     return prices;
+  }
+
+  async getFirstProductName() {
+    const productTitle = await waitForVisible(this.driver, this.productTitles);
+    return productTitle.getText();
+  }
+
+  async openFirstProduct() {
+    const productTitle = await waitForVisible(this.driver, this.productTitles);
+    await safeClick(this.driver, productTitle);
+  }
+
+  async hasFilterButton() {
+    const buttons = await this.driver.findElements(By.xpath("//button[contains(@class, 'filter')]"));
+
+    for (const button of buttons) {
+      if (await button.isDisplayed().catch(() => false)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  async openLaptopCategory() {
+    await this.driver.get(`${BASE_URL}/laptop.html`);
+    await this.driver.wait(until.elementLocated(By.css('body')), DEFAULT_TIMEOUT);
+  }
+
+  async applyBrandFilter(brand) {
+    const filterButton = await waitForVisible(this.driver, By.css('button.filter-button, button[class*="filter"]'));
+    await safeClick(this.driver, filterButton);
+
+    const brandButton = await waitForVisible(
+      this.driver,
+      By.xpath(`//div[@id='filterAll']//button[normalize-space()=${JSON.stringify(brand)}]`)
+    );
+    await safeClick(this.driver, brandButton);
+
+    const submitButton = await waitForVisible(
+      this.driver,
+      By.xpath("//div[@id='filterAll']//button[contains(., 'Xem kết quả')]")
+    );
+    await safeClick(this.driver, submitButton);
+    await this.driver.sleep(1500);
+  }
+
+  async loadAllVisibleProducts() {
+    const showMoreLocator = By.css('a.button__show-more-product, a.btn-show-more');
+
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      const buttons = await this.driver.findElements(showMoreLocator);
+      let visibleButton = null;
+
+      for (const button of buttons) {
+        if (await button.isDisplayed().catch(() => false)) {
+          visibleButton = button;
+          break;
+        }
+      }
+
+      if (!visibleButton) {
+        return;
+      }
+
+      await safeClick(this.driver, visibleButton);
+      await this.driver.sleep(1800);
+    }
+  }
+
+  async getProductCardCount() {
+    const products = await this.driver.findElements(
+      By.css('.product-list-filter.is-flex.is-flex-wrap-wrap > div.product-info, .product-list-filter .product-info')
+    );
+
+    let count = 0;
+
+    for (const product of products) {
+      if (await product.isDisplayed().catch(() => false)) {
+        count += 1;
+      }
+    }
+
+    return count;
   }
 }

@@ -1,11 +1,12 @@
 import { By, Key, until } from 'selenium-webdriver';
 import { BASE_URL, DEFAULT_TIMEOUT } from '../config.js';
+import { hideCookieConsentIfPresent } from '../utils/overlays.js';
 import { safeClick, waitForVisible } from '../utils/waits.js';
 
 export class HomePage {
   constructor(driver) {
     this.driver = driver;
-    this.searchInput = By.css('input[placeholder*="muốn mua"], input[placeholder*="Bạn muốn mua"]');
+    this.searchInput = By.css('input[data-slot="input"], input[placeholder*="muốn mua"], input[placeholder*="Bạn muốn mua"]');
   }
 
   async open() {
@@ -14,16 +15,8 @@ export class HomePage {
   }
 
   async dismissCookieBannerIfPresent() {
-    const buttons = await this.driver.findElements(By.xpath("//button[contains(., 'Chấp nhận')]"));
-
-    for (const button of buttons) {
-      if (await button.isDisplayed().catch(() => false)) {
-        await safeClick(this.driver, button);
-        return true;
-      }
-    }
-
-    return false;
+    await hideCookieConsentIfPresent(this.driver);
+    return true;
   }
 
   async search(keyword) {
@@ -43,5 +36,45 @@ export class HomePage {
 
   async getSearchInput() {
     return waitForVisible(this.driver, this.searchInput);
+  }
+
+  async typeSearchKeyword(keyword) {
+    const input = await waitForVisible(this.driver, this.searchInput);
+
+    await safeClick(this.driver, input);
+    await input.clear();
+    await input.sendKeys(keyword);
+  }
+
+  async getAutocompleteText() {
+    await this.driver.wait(async () => {
+      const text = await this.driver.executeScript(() => document.body.innerText || '');
+      return /Có phải bạn muốn tìm|Sản phẩm gợi ý|Khách hàng thường tìm kiếm/i.test(text);
+    }, DEFAULT_TIMEOUT);
+
+    return this.driver.executeScript(() => {
+      const candidates = Array.from(document.querySelectorAll('body *'))
+        .map((el) => {
+          const style = window.getComputedStyle(el);
+          const rect = el.getBoundingClientRect();
+          const text = (el.innerText || '').trim();
+
+          return {
+            text,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height,
+            isVisible: rect.width > 100
+              && rect.height > 40
+              && style.display !== 'none'
+              && style.visibility !== 'hidden',
+            looksLikeSuggestion: /Có phải bạn muốn tìm|Sản phẩm gợi ý|Khách hàng thường tìm kiếm/i.test(text)
+          };
+        })
+        .filter((item) => item.isVisible && item.looksLikeSuggestion && item.top < 800)
+        .sort((left, right) => (left.height * left.width) - (right.height * right.width));
+
+      return candidates[0]?.text || '';
+    });
   }
 }
