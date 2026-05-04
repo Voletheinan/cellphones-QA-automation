@@ -1,0 +1,7 @@
+node_modules/
+screenshots/
+reports/
+.selenium/
+*.log
+.env
+data/account.local.json

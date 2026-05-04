@@ -1,0 +1,26 @@
+{
+  "name": "cellphones-qa-automation",
+  "version": "1.0.0",
+  "description": "Automation test suite for CellphoneS using Selenium WebDriver, Mocha and Chai.",
+  "type": "module",
+  "scripts": {
+    "test": "mocha \"test/**/*.spec.js\" --timeout 180000",
+    "test:headed": "set HEADLESS=false&& mocha \"test/**/*.spec.js\" --timeout 180000",
+    "test:report": "mocha \"test/**/*.spec.js\" --timeout 180000 --reporter mochawesome --reporter-options reportDir=reports,reportFilename=cellphones-report,overwrite=false,html=true,json=true"
+  },
+  "keywords": [
+    "selenium",
+    "mocha",
+    "chai",
+    "automation-testing",
+    "cellphones"
+  ],
+  "author": "Software Testing Coursework",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^6.2.2",
+    "mocha": "^11.7.5",
+    "mochawesome": "^7.1.4",
+    "selenium-webdriver": "^4.43.0"
+  }
+}
