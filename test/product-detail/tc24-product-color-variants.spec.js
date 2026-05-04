@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { takeScreenshot } from '../src/utils/screenshot.js';
-import { useCellphonesTestContext } from './helpers/setup.js';
+import { takeScreenshot } from '../../src/utils/screenshot.js';
+import { useCellphonesTestContext } from '../helpers/setup.js';
 
 describe('TC24 - Bien the mau sac san pham', function () {
   const context = useCellphonesTestContext();

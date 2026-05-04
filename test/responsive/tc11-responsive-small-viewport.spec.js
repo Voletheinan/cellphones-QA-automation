@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { takeScreenshot } from '../src/utils/screenshot.js';
-import { hideCookieConsentIfPresent } from '../src/utils/overlays.js';
-import { useCellphonesTestContext } from './helpers/setup.js';
+import { takeScreenshot } from '../../src/utils/screenshot.js';
+import { hideCookieConsentIfPresent } from '../../src/utils/overlays.js';
+import { useCellphonesTestContext } from '../helpers/setup.js';
 
 const SMALL_VIEWPORT = {
   width: Number(process.env.RESPONSIVE_WIDTH || 200),

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import { takeScreenshot } from '../src/utils/screenshot.js';
-import { useCellphonesTestContext } from './helpers/setup.js';
+import { takeScreenshot } from '../../src/utils/screenshot.js';
+import { useCellphonesTestContext } from '../helpers/setup.js';
 
 describe('TC05 - Boundary search 256 ky tu', function () {
   const context = useCellphonesTestContext();

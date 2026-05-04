@@ -7,7 +7,7 @@
     "test": "mocha \"test/**/*.spec.js\" --timeout 180000",
     "test:headed": "set HEADLESS=false&& mocha \"test/**/*.spec.js\" --timeout 180000",
     "test:report": "mocha \"test/**/*.spec.js\" --timeout 180000 --reporter mochawesome --reporter-options reportDir=reports,reportFilename=cellphones-report,overwrite=false,html=true,json=true",
-    "test:search-product": "mocha \"test/tc{02,03,07,12,13,21,22,23,24,25}-*.spec.js\" --timeout 180000"
+    "test:search-product": "mocha \"test/{search,product-detail,product-filter}/**/*.spec.js\" --timeout 180000"
   },
   "keywords": [
     "selenium",
