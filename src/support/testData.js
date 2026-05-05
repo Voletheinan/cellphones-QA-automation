@@ -14,9 +14,17 @@ function readLocalAccount() {
 
 export function getPersonalAccount() {
   const localAccount = readLocalAccount();
+  const identifier = process.env.CELLPHONES_EMAIL
+    || process.env.CELLPHONES_PHONE
+    || localAccount.email
+    || localAccount.phone
+    || '';
 
   return {
+    identifier,
+    email: process.env.CELLPHONES_EMAIL || localAccount.email || '',
     phone: process.env.CELLPHONES_PHONE || localAccount.phone || '',
-    password: process.env.CELLPHONES_PASSWORD || localAccount.password || ''
+    password: process.env.CELLPHONES_PASSWORD || localAccount.password || '',
+    expectedName: process.env.CELLPHONES_EXPECTED_NAME || localAccount.expectedName || ''
   };
 }

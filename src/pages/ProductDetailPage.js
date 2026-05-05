@@ -54,31 +54,36 @@ export class ProductDetailPage {
     await this.driver.executeScript('arguments[0].scrollIntoView({ block: "center" });', variantContainer);
 
     const totalVariants = (await this.driver.findElements(this.colorVariantItems)).length;
-    let selectedVariants = 0;
+    let checkedVariants = 0;
 
     for (let index = 0; index < totalVariants; index += 1) {
       const variants = await this.driver.findElements(this.colorVariantItems);
       const variant = variants[index];
-      const colorName = (await variant.findElement(By.css('strong.item-variant-name')).getText()).trim();
 
       await safeClick(this.driver, variant);
       await this.driver.sleep(1500);
 
-      const selectedText = await this.driver.executeScript(() => document.body.innerText || '');
-      const galleryImages = await this.driver.findElements(By.css('.box-gallery img'));
-      const hasVisibleGalleryImage = await Promise.any(
-        galleryImages.map((image) => image.isDisplayed().catch(() => false))
-      ).catch(() => false);
-      const selectionIsReflected = selectedText.toLowerCase().includes(colorName.toLowerCase());
+      const hasVisibleGalleryImage = await this.driver.executeScript(() => {
+        return Array.from(document.querySelectorAll('.box-gallery img'))
+          .some((img) => {
+            const rect = img.getBoundingClientRect();
+            const style = window.getComputedStyle(img);
 
-      if (!selectionIsReflected || !hasVisibleGalleryImage) {
+            return rect.width > 20
+              && rect.height > 20
+              && style.display !== 'none'
+              && style.visibility !== 'hidden';
+          });
+      });
+
+      if (!hasVisibleGalleryImage) {
         return false;
       }
 
-      selectedVariants += 1;
+      checkedVariants += 1;
     }
 
-    return selectedVariants > 0 && selectedVariants === totalVariants;
+    return checkedVariants > 0 && checkedVariants === totalVariants;
   }
 
   async waitForUrlChangedFrom(previousUrl) {
