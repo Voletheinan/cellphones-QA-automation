@@ -1,27 +1,42 @@
 # CellphoneS QA Automation
 
-Bo test tu dong hoa cho website `https://cellphones.com.vn/` bang JavaScript, Selenium WebDriver, Mocha va Chai.
+Bo test tu dong hoa cho `https://cellphones.com.vn/` bang JavaScript, Selenium WebDriver, Mocha va Chai.
 
-## Cau truc thu muc
+## Nguyen tac code test
+
+- Moi test case ghi ro `Action`, `Expected` va fail condition ngay trong cac `expect(...)`.
+- TC01 den TC10 khong import `src/helpers/*`; Selenium action duoc viet truc tiep trong tung file spec.
+- Input test quan trong duoc viet truc tiep trong test case de de doc va de bao tri.
+
+## Cau truc hien tai
 
 ```text
 cellphones-QA-automation/
   src/
-    config/
-      environment.js    # URL, timeout, browser settings
-    data/
-      README.md         # Huong dan tao du lieu local
-      account.example.json
-    pages/              # Page Object Model
-    support/            # Driver, wait, overlay, screenshot, test data helpers
+    config/environment.js
+    data/account.local.json
+    support/driver.js
+    support/overlays.js
+    support/screenshot.js
+    support/testData.js
   test/
-    helpers/setup.js    # Setup Chrome, Page Object va screenshot cuoi test
-    site/               # Trang chu, newsletter, responsive
-    auth/               # Dang nhap va tai khoan
-    search/             # Tim kiem, sap xep, loc danh sach san pham
-    product-detail/     # Trang chi tiet san pham
-  screenshots/          # Tu dong sinh khi chay test
-  reports/              # Tu dong sinh khi chay test:report
+    auth/
+      tc01-login-success.spec.js
+      tc02-login-failed.spec.js
+    search/
+      tc03-valid-search.spec.js
+      tc04-search-254-characters.spec.js
+      tc05-no-result-search.spec.js
+    product-detail/
+      tc06-product-detail.spec.js
+    filter/
+      tc07-category-filter.spec.js
+      tc08-brand-price-filter.spec.js
+    cart/
+      tc09-add-to-cart.spec.js
+      tc10-update-cart-quantity.spec.js
+  screenshots/
+  reports/
 ```
 
 ## Chay test
@@ -42,45 +57,46 @@ Tao HTML report:
 npm run test:report
 ```
 
-Chay rieng nhom search/product:
+Chay rieng mot nhom:
 
 ```bash
-npm run test:search-product
-```
-
-Chay rieng nhom site hoac auth:
-
-```bash
-npm run test:site
 npm run test:auth
+npm run test:search
+npm run test:cart
 ```
 
-## 18 Test Cases
+## Du lieu dang nhap
 
-1. `test/site/tc01-homepage.spec.js` - Trang chu load dung HTTPS va hien thi o tim kiem.
-2. `test/search/tc02-valid-search.spec.js` - Tim kiem keyword hop le `iphone 15` tra ve san pham.
-3. `test/search/tc03-no-result-search.spec.js` - Tim kiem keyword khong ton tai tra ve 0 san pham va thong bao ro rang.
-4. `test/search/tc04-empty-search-boundary.spec.js` - Boundary search rong khong duoc hien thi chu `null`.
-5. `test/search/tc05-long-search-boundary.spec.js` - Boundary search 256 ky tu khong duoc tra ve trang bao tri.
-6. `test/search/tc06-script-payload-security.spec.js` - Security input script khong duoc gay loi 403 va khong execute alert.
-7. `test/search/tc07-sort-price.spec.js` - Sap xep `Gia thap` phai tang dan theo gia.
-8. `test/site/tc08-newsletter-validation.spec.js` - Newsletter validate email va so dien thoai khong hop le.
-9. `test/auth/tc09-login-validation.spec.js` - Dang nhap voi so dien thoai khong hop le phai hien thi validation.
-10. `test/auth/tc10-login-valid-account.spec.js` - Dang nhap bang tai khoan hop le tu `src/data/account.local.json` hoac bien moi truong.
-11. `test/site/tc11-responsive-small-viewport.spec.js` - Responsive layout viewport `200x800` khong duoc tran ngang, vuot viewport hoac chong lan header/navigation.
-12. `test/search/tc12-search-autocomplete.spec.js` - Goi y tim kiem hien thi noi dung lien quan.
-13. `test/search/tc13-search-filter-button.spec.js` - Kiem tra nut bo loc trong trang ket qua tim kiem.
-14. `test/product-detail/tc21-product-detail-navigation.spec.js` - Click san pham dau tien mo dung trang chi tiet.
-15. `test/product-detail/tc22-product-variant-price.spec.js` - Gia thay doi khi chon bien the dung luong.
-16. `test/product-detail/tc23-product-specifications.spec.js` - Trang chi tiet hien thi bang thong so ky thuat.
-17. `test/product-detail/tc24-product-color-variants.spec.js` - Bien the mau sac co anh san pham tuong ung.
-18. `test/search/tc25-laptop-brand-filter.spec.js` - Loc laptop Apple va dem danh sach san pham.
+TC01 can tai khoan hop le va ten user du kien. Tao file local, khong commit:
 
-## Bug candidates de dua vao bao cao
+```text
+src/data/account.local.json
+```
 
-- `TC04`: Search rong hien thi `Kết quả tìm kiếm cho: 'null'`, gay loi usability/data rendering.
-- `TC05`: Search 256 ky tu co the tra ve trang `Website đang bảo trì`, gay loi boundary handling.
-- `TC06`: Payload HTML/script co the bi day sang trang 403 thay vi hien thi thong bao input khong hop le, gay loi usability/security hardening.
-- `TC11`: Viewport nho `200x800` lam trang bi horizontal overflow, co element vuot viewport.
+Theo mau:
 
-Moi test deu co assertion bang Chai va screenshot tu dong trong thu muc `screenshots/` sau moi buoc quan trong va sau Pass/Fail.
+```json
+{
+  "email": "YOUR_EMAIL",
+  "phone": "YOUR_PHONE_NUMBER",
+  "password": "YOUR_PASSWORD",
+  "expectedName": "YOUR_DISPLAY_NAME"
+}
+```
+
+Neu thieu tai khoan, TC01 va cac TC chuc nang sau dang nhap se khong chay dung. `expectedName` la tuy chon.
+
+TC03 den TC10 se dang nhap bang `src/data/account.local.json` truoc khi kiem tra action chinh. TC01 la test dang nhap thanh cong, TC02 la test dang nhap that bai nen khong co pre-login.
+
+## 10 Test Cases
+
+1. `test/auth/tc01-login-success.spec.js` - Dang nhap thanh cong bang email/so dien thoai + password hop le, chuyen khoi login va hien thi ten user.
+2. `test/auth/tc02-login-failed.spec.js` - Dang nhap that bai bang tai khoan sai, hien thi loi va khong redirect sai.
+3. `test/search/tc03-valid-search.spec.js` - Tim kiem hop le `Samsung Galaxy S26 12GB 256GB`, co danh sach san pham lien quan.
+4. `test/search/tc04-search-254-characters.spec.js` - Tim kiem chuoi 254 ky tu `a`, trang van phan hoi va khong crash/500/maintenance.
+5. `test/search/tc05-no-result-search.spec.js` - DDT tim kiem keyword khong ton tai, khong co san pham va co thong bao khong tim thay.
+6. `test/product-detail/tc06-product-detail.spec.js` - Click `Laptop ASUS Vivobook S 14 FLIP TP3402VA-LZ632W`, mo trang chi tiet dung san pham, co ten, gia, anh, mo ta/thong so.
+7. `test/filter/tc07-category-filter.spec.js` - Chon danh muc Dien thoai, danh sach chi gom san pham dien thoai.
+8. `test/filter/tc08-brand-price-filter.spec.js` - Loc hang Apple va khoang gia 15-20 trieu, san pham dung hang va dung gia.
+9. `test/cart/tc09-add-to-cart.spec.js` - Them `Vong deo tay thong minh Huawei Band 11` vao gio, gio co dung san pham, gia va so luong.
+10. `test/cart/tc10-update-cart-quantity.spec.js` - Sau khi dang nhap, vao gio hang co san pham san, bam `+` mot lan neu so luong hien tai nho hon 5.
