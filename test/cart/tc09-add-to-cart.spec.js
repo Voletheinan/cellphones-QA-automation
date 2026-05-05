@@ -13,10 +13,12 @@ const LOGIN_PASSWORD_INPUT = 'input[type="password"], input[placeholder*="mật 
 describe('TC09 - Thêm vào giỏ', function () {
   let browser;
 
+  // Mỗi test dùng một browser mới để tránh dữ liệu cũ trong phiên trước.
   beforeEach(async function () {
     browser = await createDriver();
   });
 
+  // Chụp screenshot cuối test và đóng browser.
   afterEach(async function () {
     if (!browser) {
       return;
@@ -82,6 +84,7 @@ describe('TC09 - Thêm vào giỏ', function () {
     expect(quantity === 1 || /\b1\b/.test(cartText), 'Fail: số lượng sản phẩm trong giỏ không phải 1').to.equal(true);
   });
 
+  // Đợi trang ở trạng thái có thể thao tác.
   async function waitUntilReady() {
     await browser.wait(async () => {
       const readyState = await browser.executeScript('return document.readyState;');
@@ -89,6 +92,7 @@ describe('TC09 - Thêm vào giỏ', function () {
     }, DEFAULT_TIMEOUT);
   }
 
+  // Tìm element đang hiển thị thật sự trên màn hình.
   async function findVisibleElement(cssSelector, timeout = DEFAULT_TIMEOUT) {
     await browser.wait(async () => {
       const elements = await browser.findElements(By.css(cssSelector));
@@ -113,11 +117,13 @@ describe('TC09 - Thêm vào giỏ', function () {
     throw new Error(`Không tìm thấy element visible: ${cssSelector}`);
   }
 
+  // Scroll tới element rồi click bằng JavaScript để tránh bị overlay nhỏ cản click.
   async function safeClick(element) {
     await browser.executeScript('arguments[0].scrollIntoView({ block: "center", inline: "center" });', element);
     await browser.executeScript('arguments[0].click();', element);
   }
 
+  // Click phần tử theo text hiển thị, phù hợp với button/link không có selector ổn định.
   async function clickVisibleText(textPatterns, timeout = DEFAULT_TIMEOUT) {
     await browser.wait(async () => browser.executeScript((patterns) => {
       const regexes = patterns.map((pattern) => new RegExp(pattern, 'i'));
@@ -139,6 +145,7 @@ describe('TC09 - Thêm vào giỏ', function () {
     }, textPatterns), timeout);
   }
 
+  // Đăng nhập bằng tài khoản cá nhân cấu hình trong file local.
   async function loginDirect() {
     const account = getPersonalAccount();
 
@@ -166,6 +173,7 @@ describe('TC09 - Thêm vào giỏ', function () {
     }, DEFAULT_TIMEOUT);
   }
 
+  // Làm sạch giỏ hàng trước khi test thêm sản phẩm mới.
   async function clearCartDirect() {
     await browser.get(BASE_URL);
     await waitUntilReady();
@@ -225,6 +233,7 @@ describe('TC09 - Thêm vào giỏ', function () {
     }
   }
 
+  // Click đúng sản phẩm trong danh sách kết quả bằng các từ khóa cần khớp.
   async function clickProductByMatchers(productMatchers) {
     await browser.wait(async () => browser.executeScript((patternSources) => {
       const regexes = patternSources.map((source) => new RegExp(source, 'i'));
@@ -249,6 +258,7 @@ describe('TC09 - Thêm vào giỏ', function () {
     await hideCookieConsentIfPresent(browser);
   }
 
+  // Lấy giá bán chính đang hiển thị trên trang chi tiết sản phẩm.
   async function getPrimaryProductPrice() {
     return browser.executeScript(() => {
       const selectors = ['.sale-price', '.box-info__box-price .product__price--show', '.product__price--show', '[class*="sale-price"]', '[class*="price"]'];
@@ -280,6 +290,7 @@ describe('TC09 - Thêm vào giỏ', function () {
     });
   }
 
+  // Đọc số lượng sản phẩm trong giỏ từ input hoặc cụm nút +/-.
   async function readVisibleQuantityDirect() {
     return browser.executeScript(() => {
       const visible = (element) => {
@@ -321,6 +332,7 @@ describe('TC09 - Thêm vào giỏ', function () {
   }
 });
 
+// Tách toàn bộ giá tiền VND trong text và đổi về dạng number.
 function parseVndPrices(text) {
   return Array.from(`${text}`.matchAll(/(\d{1,3}(?:\.\d{3}){1,}|\d{4,})\s*(?:đ|₫)/gi))
     .map((match) => Number(match[1].replace(/\./g, '')))

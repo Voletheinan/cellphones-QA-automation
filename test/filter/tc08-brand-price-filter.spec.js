@@ -12,10 +12,12 @@ const LOGIN_PASSWORD_INPUT = 'input[type="password"], input[placeholder*="mật 
 describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
   let browser;
 
+  // Tạo browser mới cho từng test để trạng thái được tách biệt.
   beforeEach(async function () {
     browser = await createDriver();
   });
 
+  // Lưu screenshot sau test rồi đóng browser.
   afterEach(async function () {
     if (!browser) {
       return;
@@ -58,6 +60,7 @@ describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
     expect(await isAvailableStockFilterActiveDirect(), 'Fail: nút Sẵn hàng chưa được chọn active').to.equal(true);
   });
 
+  // Đợi trang tải đủ trước khi tìm/click element.
   async function waitUntilReady() {
     await browser.wait(async () => {
       const readyState = await browser.executeScript('return document.readyState;');
@@ -65,6 +68,7 @@ describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
     }, DEFAULT_TIMEOUT);
   }
 
+  // Tìm element visible, tránh thao tác vào element ẩn cùng selector.
   async function findVisibleElement(cssSelector) {
     await browser.wait(async () => {
       const elements = await browser.findElements(By.css(cssSelector));
@@ -89,6 +93,7 @@ describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
     throw new Error(`Không tìm thấy element visible: ${cssSelector}`);
   }
 
+  // Click theo text hiển thị khi phần tử không có selector riêng ổn định.
   async function clickVisibleText(textPatterns) {
     await browser.wait(async () => browser.executeScript((patterns) => {
       const regexes = patterns.map((pattern) => new RegExp(pattern, 'i'));
@@ -109,6 +114,7 @@ describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
     }, textPatterns), DEFAULT_TIMEOUT);
   }
 
+  // Đăng nhập trước để các bộ lọc và trang danh mục hoạt động đúng điều kiện test.
   async function loginDirect() {
     const account = getPersonalAccount();
 
@@ -136,6 +142,7 @@ describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
     }, DEFAULT_TIMEOUT);
   }
 
+  // Click danh mục Điện thoại trên trang chủ.
   async function clickPhoneCategoryDirect() {
     await browser.wait(async () => {
       const clicked = await browser.executeScript(() => {
@@ -177,6 +184,7 @@ describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
     }, DEFAULT_TIMEOUT);
   }
 
+  // Chọn brand iPhone trong khu vực bộ lọc thương hiệu.
   async function clickIphoneBrandDirect() {
     await browser.executeScript('window.scrollTo(0, 0);');
     await browser.sleep(300);
@@ -223,6 +231,7 @@ describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
     }, DEFAULT_TIMEOUT);
   }
 
+  // Chọn filter Sẵn hàng trên danh sách sản phẩm.
   async function clickAvailableStockFilterDirect() {
     await browser.wait(async () => {
       const clicked = await browser.executeScript(() => {
@@ -275,6 +284,7 @@ describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
     }, DEFAULT_TIMEOUT);
   }
 
+  // Kiểm tra cả nút filter, chip đang chọn và URL đều thể hiện trạng thái Sẵn hàng.
   async function isAvailableStockFilterActiveDirect() {
     return browser.executeScript(() => {
       const normalizeText = (value) => `${value}`
@@ -297,6 +307,7 @@ describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
     });
   }
 
+  // Lấy một số sản phẩm đang hiển thị để assert tên và giá sau khi lọc.
   async function getVisibleProductsDirect(limit = 12) {
     return browser.executeScript((maxItems) => {
       const seen = new Set();

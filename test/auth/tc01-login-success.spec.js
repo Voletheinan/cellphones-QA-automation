@@ -21,10 +21,12 @@ const LOGIN_PASSWORD_INPUT = 'input[type="password"], input[placeholder*="mật 
 describe('TC01 - Đăng nhập thành công', function () {
   let browser;
 
+  // Mỗi test chạy trên một browser sạch để tránh dính trạng thái đăng nhập cũ.
   beforeEach(async function () {
     browser = await createDriver();
   });
 
+  // Luôn lưu screenshot cuối test rồi đóng browser.
   afterEach(async function () {
     if (!browser) {
       return;
@@ -64,6 +66,7 @@ describe('TC01 - Đăng nhập thành công', function () {
     const body = await browser.wait(until.elementLocated(By.css('body')), DEFAULT_TIMEOUT);
     const text = await body.getText();
 
+    // Nếu có tên mong đợi thì kiểm tra theo tên, nếu không dùng các dấu hiệu đã đăng nhập.
     const userIsDisplayed = account.expectedName
       ? text.includes(account.expectedName)
       : /đăng nhập thành công|dang nhap thanh cong|tài khoản|tai khoan|smember|thành viên|thanh vien|hạng|hang|điểm|diem/i.test(text)
@@ -75,6 +78,7 @@ describe('TC01 - Đăng nhập thành công', function () {
     expect(text, 'Fail: login thành công nhưng vẫn hiển thị lỗi').to.not.match(/sai|không đúng|không hợp lệ|thất bại/i);
   });
 
+  // Chờ đến khi tìm được input đang hiển thị để Selenium thao tác được.
   async function findVisibleElement(cssSelector) {
     await browser.wait(async () => {
       const elements = await browser.findElements(By.css(cssSelector));
@@ -99,6 +103,7 @@ describe('TC01 - Đăng nhập thành công', function () {
     throw new Error(`Không tìm thấy element visible: ${cssSelector}`);
   }
 
+  // Tìm và click nút/link dựa trên nội dung text, dùng khi selector của site thay đổi.
   async function clickVisibleText(textPatterns) {
     await browser.wait(async () => {
       const clicked = await browser.executeScript((patterns) => {

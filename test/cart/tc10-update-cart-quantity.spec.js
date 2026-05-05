@@ -23,10 +23,12 @@ const MAX_CART_QUANTITY = 5;
 describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
   let driver;
 
+  // Khởi tạo browser mới cho từng test case.
   beforeEach(async function () {
     driver = await createDriver();
   });
 
+  // Chụp màn hình kết quả test và đóng browser để giải phóng tài nguyên.
   afterEach(async function () {
     if (!driver) {
       return;
@@ -69,6 +71,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     expect(cartAfter.text, 'Fail: sau khi tăng số lượng, giỏ hàng bị mất sản phẩm').to.match(/\d{1,3}(?:\.\d{3})+\s*(?:đ|₫)/i);
   });
 
+  // Đợi trang tải đủ để có thể tìm element ổn định hơn.
   async function waitUntilReady() {
     await driver.wait(async () => {
       const readyState = await driver.executeScript('return document.readyState;');
@@ -76,11 +79,13 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     }, DEFAULT_TIMEOUT);
   }
 
+  // Lấy toàn bộ text trong body để kiểm tra trạng thái trang.
   async function getBodyText() {
     const body = await driver.wait(until.elementLocated(By.css('body')), DEFAULT_TIMEOUT);
     return body.getText();
   }
 
+  // Tìm element đang hiển thị, bỏ qua element bị ẩn hoặc chưa render.
   async function findVisibleElement(cssSelector, timeout = DEFAULT_TIMEOUT) {
     await driver.wait(async () => {
       const elements = await driver.findElements(By.css(cssSelector));
@@ -105,6 +110,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     throw new Error(`Không tìm thấy element visible: ${cssSelector}`);
   }
 
+  // Click theo text trên giao diện, ưu tiên phần tử có khả năng tương tác.
   async function clickVisibleText(textPatterns, timeout = DEFAULT_TIMEOUT) {
     await driver.wait(async () => {
       const clicked = await driver.executeScript((patterns) => {
@@ -164,6 +170,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     }, timeout);
   }
 
+  // Đăng nhập trực tiếp bằng tài khoản test trong file local.
   async function loginDirect() {
     const account = getPersonalAccount();
 
@@ -191,6 +198,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     }, DEFAULT_TIMEOUT);
   }
 
+  // Nếu giỏ hàng mở thêm bước đăng nhập, xử lý bước đó rồi quay lại giỏ.
   async function loginFromCartIfRequired() {
     const account = getPersonalAccount();
     const loginRequired = await driver.executeScript(() => {
@@ -229,6 +237,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     await goToCartFromHomeDirect();
   }
 
+  // Vào trang chủ rồi click nút Giỏ hàng trên header.
   async function goToCartFromHomeDirect() {
     await driver.get(BASE_URL);
     await waitUntilReady();
@@ -245,6 +254,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     await hideCookieConsentIfPresent(driver);
   }
 
+  // Tìm nút giỏ hàng gần khu vực header để tránh click nhầm nội dung khác.
   async function clickCartButtonDirect() {
     await driver.wait(async () => {
       const clicked = await driver.executeScript(() => {
@@ -298,6 +308,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     }, DEFAULT_TIMEOUT);
   }
 
+  // Điền form đăng nhập nếu form xuất hiện trong luồng giỏ hàng.
   async function fillLoginFormIfPresent(account) {
     const identifierInput = await findOptionalVisibleElement(LOGIN_IDENTIFIER_INPUT, 8000);
     const passwordInput = await findOptionalVisibleElement(LOGIN_PASSWORD_INPUT, 8000);
@@ -314,6 +325,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     await waitUntilReady();
   }
 
+  // Helper mềm: không thấy element thì trả về null thay vì làm fail ngay.
   async function findOptionalVisibleElement(cssSelector, timeout = 3000) {
     try {
       return await findVisibleElement(cssSelector, timeout);
@@ -322,6 +334,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     }
   }
 
+  // Đóng popup/modal nếu site hiển thị che khuất giỏ hàng.
   async function closeModalIfPresent() {
     await driver.executeScript(() => {
       const visible = (element) => {
@@ -344,6 +357,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     await driver.sleep(500);
   }
 
+  // Đọc trạng thái giỏ hàng: có sản phẩm, có yêu cầu login và số lượng hiện tại.
   async function getCartState() {
     return driver.executeScript(() => {
       const visible = (element) => {
@@ -460,6 +474,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
       };
       const textQuantity = readQuantityFromVisibleText();
 
+      // Ưu tiên đọc số lượng từ text hiển thị, sau đó mới fallback theo vị trí hoặc input.
       if (textQuantity !== null) {
         return { hasProduct, loginRequired, quantity: textQuantity, text };
       }
@@ -497,6 +512,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     });
   }
 
+  // Click nút + của sản phẩm đầu tiên trong giỏ.
   async function increaseQuantityByOneDirect() {
     const clicked = await driver.executeScript(() => {
       const visible = (element) => {
