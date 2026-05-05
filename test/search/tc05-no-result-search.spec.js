@@ -10,8 +10,8 @@ const SEARCH_INPUT = 'input[data-slot="input"], input[placeholder*="muốn mua"]
 const LOGIN_IDENTIFIER_INPUT = 'input[type="email"], input[placeholder*="email"], input[placeholder*="Email"], input[placeholder*="số điện thoại"], input[placeholder*="Số điện thoại"], input[placeholder*="SĐT"], input[maxlength="10"], input[name*="email"], input[name*="phone"]';
 const LOGIN_PASSWORD_INPUT = 'input[type="password"], input[placeholder*="mật khẩu"], input[placeholder*="Mật khẩu"]';
 const noResultSearchData = [
-  'abcxyz123_not_exist',
-  'zzzz_no_cellphones_result_987654'
+  'abcxyz123456',
+  'zzzz_timkiemloi_987654'
 ];
 
 describe('TC05 - Tìm kiếm không tồn tại', function () {
@@ -26,7 +26,7 @@ describe('TC05 - Tìm kiếm không tồn tại', function () {
       return;
     }
 
-    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`);
+    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`, this);
     await browser.quit();
     browser = null;
   });

@@ -57,6 +57,14 @@ Tao HTML report:
 npm run test:report
 ```
 
+Report se duoc tao tai:
+
+```text
+mochawesome-report/cellphones-report.html
+```
+
+Moi testcase se chup man hinh sau khi chay xong va chen link anh vao context cua Mochawesome report. Anh goc duoc luu trong thu muc `screenshots/`.
+
 Chay rieng mot nhom:
 
 ```bash

@@ -1,7 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import addContext from 'mochawesome/addContext.js';
 
 const SCREENSHOT_DIR = path.resolve('screenshots');
+const REPORT_DIR = path.resolve(process.env.MOCHAWESOME_REPORT_DIR || 'mochawesome-report');
 
 function sanitizeFileName(value) {
   return value
@@ -12,7 +14,7 @@ function sanitizeFileName(value) {
     .slice(0, 120);
 }
 
-export async function takeScreenshot(driver, name) {
+export async function takeScreenshot(driver, name, mochaContext) {
   await fs.mkdir(SCREENSHOT_DIR, { recursive: true });
 
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -20,5 +22,15 @@ export async function takeScreenshot(driver, name) {
   const image = await driver.takeScreenshot();
 
   await fs.writeFile(filePath, image, 'base64');
+
+  if (mochaContext?.currentTest) {
+    const reportRelativePath = path.relative(REPORT_DIR, filePath).replace(/\\/g, '/');
+
+    addContext(mochaContext, {
+      title: 'Screenshot',
+      value: reportRelativePath
+    });
+  }
+
   return filePath;
 }

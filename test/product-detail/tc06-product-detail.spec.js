@@ -22,7 +22,7 @@ describe('TC06 - Xem chi tiết sản phẩm', function () {
       return;
     }
 
-    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`);
+    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`, this);
     await browser.quit();
     browser = null;
   });

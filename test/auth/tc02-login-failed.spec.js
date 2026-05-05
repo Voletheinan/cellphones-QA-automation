@@ -29,7 +29,7 @@ describe('TC02 - Đăng nhập thất bại', function () {
       return;
     }
 
-    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`);
+    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`, this);
     await browser.quit();
     browser = null;
   });
@@ -46,7 +46,7 @@ describe('TC02 - Đăng nhập thất bại', function () {
     const passwordInput = await findVisibleElement(LOGIN_PASSWORD_INPUT);
 
     await identifierInput.clear();
-    await identifierInput.sendKeys('wrong_account@example.com');
+    await identifierInput.sendKeys('0123456789');
     await passwordInput.clear();
     await passwordInput.sendKeys('wrong_password_123');
     await clickVisibleText(['^đăng\\s+nhập$', '^dang\\s+nhap$', 'login']);

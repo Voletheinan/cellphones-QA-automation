@@ -32,7 +32,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
       return;
     }
 
-    await takeScreenshot(driver, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`);
+    await takeScreenshot(driver, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`, this);
     await driver.quit();
     driver = null;
   });
@@ -351,34 +351,60 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
         const style = window.getComputedStyle(element);
         return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
       };
-      const readQuantity = (value) => {
-        const text = `${value}`.replace(/\s+/g, ' ').trim();
-        const controlMatch = text.match(/(?:-|−)\s*(\d{1,2})\s*(?:\+|＋)/);
+      const getVisibleTextNodes = () => {
+        const nodes = [];
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
 
-        if (controlMatch) {
-          return Number(controlMatch[1]);
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          const textValue = node.textContent.replace(/\s+/g, ' ').trim();
+
+          if (!/^[1-5]$/.test(textValue) || !node.parentElement || !visible(node.parentElement)) {
+            continue;
+          }
+
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          const rect = range.getBoundingClientRect();
+          range.detach();
+
+          if (rect.width > 0 && rect.height > 0) {
+            nodes.push({ value: Number(textValue), rect });
+          }
         }
 
-        const labelMatch = text.match(/(?:số lượng|so luong|quantity|SL)\D{0,20}(\d{1,2})/i);
-
-        if (labelMatch) {
-          return Number(labelMatch[1]);
-        }
-
-        const match = text.match(/\b([1-9]\d?)\b/);
-        return match ? Number(match[1]) : null;
+        return nodes;
       };
-      const text = document.body.innerText || '';
-      const loginRequired = /vui lòng đăng nhập|vui long dang nhap|đăng nhập ngay|dang nhap ngay/i.test(text);
-      const hasProduct = /(\d{1,3}(?:\.\d{3})+|\d{4,})\s*(?:đ|₫)/i.test(text)
-        && !/giỏ hàng trống|gio hang trong|chưa có sản phẩm|chua co san pham/i.test(text);
       const readQuantityByPosition = () => {
-        const textNodes = Array.from(document.querySelectorAll('button, [role="button"], span, div, p, strong, b'));
-        const plusButtons = textNodes
+        const elements = Array.from(document.querySelectorAll('button, [role="button"], span, div, p, strong, b'));
+        const textNumbers = getVisibleTextNodes();
+        const plusButtons = elements
           .filter((element) => visible(element) && /^(\+|＋)$/.test((element.innerText || element.textContent || '').trim()))
-          .map((element) => {
-            const plusRect = element.getBoundingClientRect();
-            const numberElement = textNodes
+          .map((plus) => {
+            const plusRect = plus.getBoundingClientRect();
+            const minus = elements
+              .map((candidate) => {
+                const candidateText = (candidate.innerText || candidate.textContent || '').trim();
+
+                if (!visible(candidate) || !/^(?:-|−)$/.test(candidateText)) {
+                  return null;
+                }
+
+                const rect = candidate.getBoundingClientRect();
+                const sameRow = Math.abs((rect.top + rect.height / 2) - (plusRect.top + plusRect.height / 2)) < 24;
+                const leftOfPlus = rect.right <= plusRect.left;
+                const nearPlus = plusRect.left - rect.left < 140;
+
+                return sameRow && leftOfPlus && nearPlus ? { rect } : null;
+              })
+              .filter(Boolean)
+              .sort((left, right) => right.rect.left - left.rect.left)[0];
+
+            if (!minus) {
+              return null;
+            }
+
+            const numberFromElement = elements
               .map((candidate) => {
                 const candidateText = (candidate.innerText || candidate.textContent || '').trim();
 
@@ -387,35 +413,56 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
                 }
 
                 const rect = candidate.getBoundingClientRect();
-                const sameRow = Math.abs((rect.top + rect.height / 2) - (plusRect.top + plusRect.height / 2)) < 20;
-                const leftOfPlus = rect.right <= plusRect.left + 6 && rect.right >= plusRect.left - 90;
+                const sameRow = Math.abs((rect.top + rect.height / 2) - (plusRect.top + plusRect.height / 2)) < 24;
+                const betweenButtons = rect.left >= minus.rect.right - 8 && rect.right <= plusRect.left + 8;
 
-                if (!sameRow || !leftOfPlus) {
-                  return null;
-                }
-
-                return {
-                  value: Number(candidateText),
-                  distance: Math.abs(plusRect.left - rect.right)
-                };
+                return sameRow && betweenButtons ? { value: Number(candidateText), rect } : null;
               })
-              .filter(Boolean)
-              .sort((left, right) => left.distance - right.distance)[0];
+              .filter(Boolean)[0];
+            const numberFromTextNode = textNumbers
+              .filter(({ rect }) => {
+                const sameRow = Math.abs((rect.top + rect.height / 2) - (plusRect.top + plusRect.height / 2)) < 24;
+                const betweenButtons = rect.left >= minus.rect.right - 8 && rect.right <= plusRect.left + 8;
 
-            if (!numberElement) {
+                return sameRow && betweenButtons;
+              })[0];
+            const number = numberFromElement || numberFromTextNode;
+
+            if (!number) {
               return null;
             }
 
-            return {
-              value: numberElement.value,
-              top: plusRect.top
-            };
+            return { value: number.value, top: plusRect.top };
           })
           .filter(Boolean)
           .sort((left, right) => left.top - right.top);
 
         return plusButtons[0]?.value || null;
       };
+      const text = document.body.innerText || '';
+      const loginRequired = /vui lòng đăng nhập|vui long dang nhap|đăng nhập ngay|dang nhap ngay/i.test(text);
+      const hasProduct = /(\d{1,3}(?:\.\d{3})+|\d{4,})\s*(?:đ|₫)/i.test(text)
+        && !/giỏ hàng trống|gio hang trong|chưa có sản phẩm|chua co san pham/i.test(text);
+      const readQuantityFromVisibleText = () => {
+        const lines = text.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+
+        for (let index = 0; index < lines.length - 2; index += 1) {
+          const minusLine = lines[index];
+          const quantityLine = lines[index + 1];
+          const plusLine = lines[index + 2];
+
+          if (/^(?:-|−)$/.test(minusLine) && /^[1-5]$/.test(quantityLine) && /^(\+|＋)$/.test(plusLine)) {
+            return Number(quantityLine);
+          }
+        }
+
+        return null;
+      };
+      const textQuantity = readQuantityFromVisibleText();
+
+      if (textQuantity !== null) {
+        return { hasProduct, loginRequired, quantity: textQuantity, text };
+      }
       const positionedQuantity = readQuantityByPosition();
 
       if (positionedQuantity !== null) {
@@ -430,93 +477,58 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
         return { hasProduct, loginRequired, quantity: inputs[0], text };
       }
 
-      const plusControls = Array.from(document.querySelectorAll('button, [role="button"], span, div'))
-        .filter((element) => {
-          const controlText = (element.innerText || element.textContent || element.getAttribute('aria-label') || '').trim();
-          const className = element.getAttribute('class') || '';
-          return visible(element) && (/^(\+|＋)$/.test(controlText) || /plus|increase|increment|quantity-plus/i.test(className));
-        });
-      const quantityControls = [];
+      const headerCartQuantity = Array.from(document.querySelectorAll('span, div'))
+        .map((element) => {
+          const elementText = (element.innerText || element.textContent || '').trim();
+          const rect = element.getBoundingClientRect();
+          const style = window.getComputedStyle(element);
+          const isVisible = rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+          const isHeaderBadge = rect.top < 90 && rect.left > window.innerWidth * 0.55 && /^[1-5]$/.test(elementText);
 
-      for (const plusControl of plusControls) {
-        let container = plusControl.parentElement;
+          return isVisible && isHeaderBadge ? Number(elementText) : null;
+        })
+        .find((value) => value !== null);
 
-        for (let depth = 0; container && depth < 5; depth += 1, container = container.parentElement) {
-          const containerText = (container.innerText || container.textContent || '').replace(/\s+/g, ' ').trim();
-
-          if (containerText.length <= 80 && /(\+|＋)/.test(containerText) && /(-|−)/.test(containerText)) {
-            const value = readQuantity(containerText);
-
-            if (value !== null) {
-              quantityControls.push({
-                value,
-                top: container.getBoundingClientRect().top
-              });
-              break;
-            }
-          }
-        }
+      if (hasProduct && headerCartQuantity !== undefined) {
+        return { hasProduct, loginRequired, quantity: headerCartQuantity, text };
       }
 
-      if (quantityControls.length > 0) {
-        quantityControls.sort((left, right) => left.top - right.top);
-        return { hasProduct, loginRequired, quantity: quantityControls[0].value, text };
-      }
-
-      const quantity = readQuantity(text);
-
-      return { hasProduct, loginRequired, quantity, text };
+      return { hasProduct, loginRequired, quantity: null, text };
     });
   }
 
   async function increaseQuantityByOneDirect() {
-    const plusButton = await driver.executeScript(() => {
+    const clicked = await driver.executeScript(() => {
       const visible = (element) => {
         const rect = element.getBoundingClientRect();
         const style = window.getComputedStyle(element);
         return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
       };
-      const candidates = Array.from(document.querySelectorAll('button, [role="button"], span, div, svg, i'))
-        .map((element) => {
-          if (!visible(element)) {
-            return null;
-          }
+      const elements = Array.from(document.querySelectorAll('button, [role="button"], span, div'));
+      const candidates = elements
+        .filter((element) => visible(element) && /^(\+|＋)$/.test((element.innerText || element.textContent || '').trim()))
+        .map((plus) => {
+          const plusRect = plus.getBoundingClientRect();
+          const hasMinusOnSameRow = elements.some((candidate) => {
+            const candidateText = (candidate.innerText || candidate.textContent || '').trim();
 
-          const text = (element.innerText || element.textContent || element.getAttribute('aria-label') || '').trim();
-          const className = element.getAttribute('class') || '';
-          const label = `${text} ${className}`;
-
-          if (!(/^(\+|＋)$/.test(text) || /plus|increase|increment|tăng|them|add|quantity-plus/i.test(label))) {
-            return null;
-          }
-
-          const rect = element.getBoundingClientRect();
-
-          if (/^(\+|＋)$/.test(text)) {
-            return {
-              element,
-              top: rect.top,
-              right: rect.right,
-              text
-            };
-          }
-
-          let container = element.parentElement;
-
-          for (let depth = 0; container && depth < 5; depth += 1, container = container.parentElement) {
-            const containerText = (container.innerText || container.textContent || '').replace(/\s+/g, ' ').trim();
-
-            if (/(?:-|−)\s*\d{1,2}\s*(?:\+|＋)/.test(containerText)) {
-              return {
-                element,
-                top: rect.top,
-                right: rect.right,
-                text: containerText
-              };
+            if (!visible(candidate) || !/^(?:-|−)$/.test(candidateText)) {
+              return false;
             }
+
+            const rect = candidate.getBoundingClientRect();
+            const sameRow = Math.abs((rect.top + rect.height / 2) - (plusRect.top + plusRect.height / 2)) < 24;
+            const leftOfPlus = rect.right <= plusRect.left;
+            const nearPlus = plusRect.left - rect.left < 140;
+
+            return sameRow && leftOfPlus && nearPlus;
+          });
+
+          if (!hasMinusOnSameRow) {
+            return null;
           }
 
-          return null;
+          return { element: plus, top: plusRect.top, right: plusRect.right };
         })
         .filter(Boolean)
         .sort((left, right) => left.top - right.top || right.right - left.right);
@@ -524,19 +536,21 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
       const target = targetElement?.closest('button, [role="button"]') || targetElement;
 
       if (!target) {
-        return null;
+        return false;
       }
 
       target.scrollIntoView({ block: 'center', inline: 'center' });
-      return target;
+      target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window }));
+      target.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, view: window }));
+      target.click();
+      return true;
     });
 
-    if (!plusButton) {
+    if (!clicked) {
       throw new Error('Không tìm thấy nút + để cộng thêm 1 sản phẩm trong giỏ');
     }
 
-    await driver.actions({ async: true }).move({ origin: plusButton }).click().perform();
-    await driver.sleep(1000);
+    await driver.sleep(1500);
     await closeModalIfPresent();
   }
 });

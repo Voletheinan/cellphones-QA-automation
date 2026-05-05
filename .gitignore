@@ -1,6 +1,7 @@
 node_modules/
 screenshots/
 reports/
+mochawesome-report/
 .selenium/
 *.log
 .env

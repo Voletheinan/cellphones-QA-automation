@@ -30,7 +30,7 @@ describe('TC01 - Đăng nhập thành công', function () {
       return;
     }
 
-    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`);
+    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`, this);
     await browser.quit();
     browser = null;
   });
