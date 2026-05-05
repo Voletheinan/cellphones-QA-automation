@@ -21,7 +21,7 @@ describe('TC07 - Lọc theo danh mục', function () {
       return;
     }
 
-    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`);
+    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`, this);
     await browser.quit();
     browser = null;
   });

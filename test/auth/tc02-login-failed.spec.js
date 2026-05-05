@@ -20,16 +20,18 @@ const LOGIN_PASSWORD_INPUT = 'input[type="password"], input[placeholder*="mật 
 describe('TC02 - Đăng nhập thất bại', function () {
   let browser;
 
+  // Mỗi test mở browser mới để không bị ảnh hưởng bởi session cũ.
   beforeEach(async function () {
     browser = await createDriver();
   });
 
+  // Sau test luôn chụp màn hình rồi đóng browser để dễ kiểm tra lỗi.
   afterEach(async function () {
     if (!browser) {
       return;
     }
 
-    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`);
+    await takeScreenshot(browser, `${this.currentTest.title}-${this.currentTest.state || 'unknown'}`, this);
     await browser.quit();
     browser = null;
   });
@@ -46,7 +48,7 @@ describe('TC02 - Đăng nhập thất bại', function () {
     const passwordInput = await findVisibleElement(LOGIN_PASSWORD_INPUT);
 
     await identifierInput.clear();
-    await identifierInput.sendKeys('wrong_account@example.com');
+    await identifierInput.sendKeys('0123456789');
     await passwordInput.clear();
     await passwordInput.sendKeys('wrong_password_123');
     await clickVisibleText(['^đăng\\s+nhập$', '^dang\\s+nhap$', 'login']);
@@ -61,6 +63,7 @@ describe('TC02 - Đăng nhập thất bại', function () {
     expect(text, 'Fail: đăng nhập sai nhưng không hiển thị thông báo lỗi').to.match(/sai|không đúng|không tồn tại|không hợp lệ|thất bại|vui lòng/i);
   });
 
+  // Tìm element đầu tiên đang hiển thị thật sự trên màn hình.
   async function findVisibleElement(cssSelector) {
     await browser.wait(async () => {
       const elements = await browser.findElements(By.css(cssSelector));
@@ -85,6 +88,7 @@ describe('TC02 - Đăng nhập thất bại', function () {
     throw new Error(`Không tìm thấy element visible: ${cssSelector}`);
   }
 
+  // Click theo chữ hiển thị, ưu tiên button/link có text khớp nhất.
   async function clickVisibleText(textPatterns) {
     await browser.wait(async () => {
       const clicked = await browser.executeScript((patterns) => {

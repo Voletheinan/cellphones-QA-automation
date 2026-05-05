@@ -7,7 +7,7 @@
     "test": "set HEADLESS=false&& mocha \"test/auth/**/*.spec.js\" \"test/search/**/*.spec.js\" \"test/product-detail/**/*.spec.js\" \"test/filter/**/*.spec.js\" \"test/cart/**/*.spec.js\" --timeout 180000",
     "test:headed": "npm test",
     "test:headless": "set HEADLESS=true&& mocha \"test/auth/**/*.spec.js\" \"test/search/**/*.spec.js\" \"test/product-detail/**/*.spec.js\" \"test/filter/**/*.spec.js\" \"test/cart/**/*.spec.js\" --timeout 180000",
-    "test:report": "set HEADLESS=false&& mocha \"test/auth/**/*.spec.js\" \"test/search/**/*.spec.js\" \"test/product-detail/**/*.spec.js\" \"test/filter/**/*.spec.js\" \"test/cart/**/*.spec.js\" --timeout 180000 --reporter mochawesome --reporter-options reportDir=reports,reportFilename=cellphones-report,overwrite=false,html=true,json=true",
+    "test:report": "set HEADLESS=false&& set MOCHAWESOME_REPORT_DIR=mochawesome-report&& mocha \"test/auth/**/*.spec.js\" \"test/search/**/*.spec.js\" \"test/product-detail/**/*.spec.js\" \"test/filter/**/*.spec.js\" \"test/cart/**/*.spec.js\" --timeout 180000 --reporter mochawesome --reporter-options reportDir=mochawesome-report,reportFilename=cellphones-report,overwrite=true,html=true,json=true",
     "test:auth": "set HEADLESS=false&& mocha \"test/auth/**/*.spec.js\" --timeout 180000",
     "test:search": "set HEADLESS=false&& mocha \"test/search/**/*.spec.js\" --timeout 180000",
     "test:cart": "set HEADLESS=false&& mocha \"test/cart/**/*.spec.js\" --timeout 180000"
