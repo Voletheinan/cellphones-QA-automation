@@ -81,8 +81,8 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
 
   // Lấy toàn bộ text trong body để kiểm tra trạng thái trang.
   async function getBodyText() {
-    const body = await driver.wait(until.elementLocated(By.css('body')), DEFAULT_TIMEOUT);
-    return body.getText();
+    await driver.wait(until.elementLocated(By.css('body')), DEFAULT_TIMEOUT);
+    return driver.executeScript(() => document.body.innerText || '');
   }
 
   // Tìm element đang hiển thị, bỏ qua element bị ẩn hoặc chưa render.
