@@ -44,6 +44,7 @@ describe('TC01 - Đăng nhập thành công', function () {
       this.skip();
     }
 
+    // Dữ liệu kiểm tra: tài khoản hợp lệ lấy từ src/data/account.local.json.
     // Action: nhập email/số điện thoại và password hợp lệ, sau đó bấm Đăng nhập.
     await browser.get(`${SMEMBER_URL}/login`);
     await browser.wait(async () => {
@@ -66,13 +67,15 @@ describe('TC01 - Đăng nhập thành công', function () {
     const body = await browser.wait(until.elementLocated(By.css('body')), DEFAULT_TIMEOUT);
     const text = await body.getText();
 
+    // Dữ liệu đối chiếu: URL hiện tại và nội dung trang sau khi đăng nhập.
     // Nếu có tên mong đợi thì kiểm tra theo tên, nếu không dùng các dấu hiệu đã đăng nhập.
     const userIsDisplayed = account.expectedName
       ? text.includes(account.expectedName)
       : /đăng nhập thành công|dang nhap thanh cong|tài khoản|tai khoan|smember|thành viên|thanh vien|hạng|hang|điểm|diem/i.test(text)
         || text.includes(account.identifier);
 
-    // Expected: đăng nhập thành công, chuyển khỏi form login/dashboard và hiển thị tín hiệu user đã đăng nhập.
+    // Kiểm tra: các expect bên dưới xác nhận đăng nhập thành công.
+    // Mong đợi: đăng nhập thành công, chuyển khỏi form login/dashboard và hiển thị tín hiệu user đã đăng nhập.
     expect(currentUrl, 'Fail: vẫn ở form login, không chuyển trang sau khi đăng nhập').to.not.include('/login');
     expect(userIsDisplayed, 'Fail: đăng nhập xong nhưng không hiển thị thông tin user').to.equal(true);
     expect(text, 'Fail: login thành công nhưng vẫn hiển thị lỗi').to.not.match(/sai|không đúng|không hợp lệ|thất bại/i);

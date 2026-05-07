@@ -43,6 +43,7 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     // Precondition: người dùng đã đăng nhập và giỏ hàng đã có ít nhất 1 sản phẩm với số lượng nhỏ hơn 5.
     await loginDirect();
 
+    // Dữ liệu kiểm tra: sản phẩm đầu tiên đang có sẵn trong giỏ hàng.
     // Action: vào trang chủ CellphoneS, chọn Giỏ hàng trên header, rồi bấm + một lần cho sản phẩm đang có trong giỏ.
     await goToCartFromHomeDirect();
     await loginFromCartIfRequired();
@@ -50,6 +51,9 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
 
     const cartBefore = await getCartState();
 
+    // Dữ liệu đối chiếu trước khi tăng: trạng thái login, có sản phẩm và số lượng hiện tại.
+    // Kiểm tra: giỏ phải đủ điều kiện để tăng số lượng.
+    // Mong đợi: đã login, có sản phẩm, đọc được số lượng và số lượng < 5.
     expect(cartBefore.loginRequired, 'Fail: vào giỏ hàng nhưng CellphoneS vẫn yêu cầu đăng nhập').to.equal(false);
     expect(cartBefore.hasProduct, 'Fail: giỏ hàng chưa có sản phẩm nên không thể cộng thêm số lượng').to.equal(true);
     expect(cartBefore.quantity, 'Fail: không đọc được số lượng hiện tại trong giỏ').to.be.a('number').and.greaterThan(0);
@@ -65,7 +69,9 @@ describe('TC10 - Tăng số lượng trong giỏ hàng', function () {
     }, DEFAULT_TIMEOUT);
     const cartAfter = await getCartState();
 
-    // Expected: số lượng tăng đúng 1 và không vượt quá giới hạn 5 sản phẩm.
+    // Dữ liệu đối chiếu sau khi tăng: số lượng và nội dung giỏ hàng mới.
+    // Kiểm tra: các expect bên dưới xác nhận bấm + tăng đúng 1 sản phẩm.
+    // Mong đợi: số lượng tăng đúng 1 và không vượt quá giới hạn 5 sản phẩm.
     expect(cartAfter.quantity, 'Fail: bấm + nhưng số lượng không tăng thêm đúng 1').to.equal(cartBefore.quantity + 1);
     expect(cartAfter.quantity, `Fail: số lượng sau khi tăng vượt quá giới hạn ${MAX_CART_QUANTITY} sản phẩm`).to.be.at.most(MAX_CART_QUANTITY);
     expect(cartAfter.text, 'Fail: sau khi tăng số lượng, giỏ hàng bị mất sản phẩm').to.match(/\d{1,3}(?:\.\d{3})+\s*(?:đ|₫)/i);

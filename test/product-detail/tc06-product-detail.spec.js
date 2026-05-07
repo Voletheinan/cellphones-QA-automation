@@ -31,6 +31,9 @@ describe('TC06 - Xem chi tiết sản phẩm', function () {
     // Precondition: đăng nhập đúng tài khoản trước khi kiểm tra chức năng chính.
     await loginDirect();
 
+    // Dữ liệu kiểm tra: tên sản phẩm cần tìm trên CellphoneS.
+    const keyword = 'Laptop ASUS Vivobook S 14 FLIP TP3402VA-LZ632W';
+
     // Action: tìm Laptop ASUS Vivobook S 14 FLIP TP3402VA-LZ632W và click vào sản phẩm đầu tiên.
     await browser.get(BASE_URL);
     await waitUntilReady();
@@ -39,24 +42,27 @@ describe('TC06 - Xem chi tiết sản phẩm', function () {
     const input = await findVisibleElement(SEARCH_INPUT);
     await input.click();
     await input.clear();
-    await input.sendKeys('Laptop ASUS Vivobook S 14 FLIP TP3402VA-LZ632W', Key.ENTER);
+    await input.sendKeys(keyword, Key.ENTER);
 
     try {
       await browser.wait(until.urlContains('/catalogsearch/result'), 8000);
     } catch {
-      await browser.get(`${BASE_URL}/catalogsearch/result?q=${encodeURIComponent('Laptop ASUS Vivobook S 14 FLIP TP3402VA-LZ632W')}`);
+      await browser.get(`${BASE_URL}/catalogsearch/result?q=${encodeURIComponent(keyword)}`);
     }
 
     await waitUntilReady();
     await hideCookieConsentIfPresent(browser);
 
     const products = await getVisibleProductsDirect(3);
+    // Kiểm tra: danh sách tìm kiếm phải có ít nhất một sản phẩm để mở chi tiết.
+    // Mong đợi: products.length > 0.
     expect(products.length, 'Fail: không có sản phẩm để mở chi tiết').to.be.greaterThan(0);
 
     const expectedToken = products[0].name
       .toLowerCase()
       .split(/\s+/)
       .find((word) => word.length >= 4 && !/^\d/.test(word) && !/^(laptop|máy|tính|chính|hãng)$/i.test(word)) || products[0].name.toLowerCase().split(/\s+/)[0];
+    // Dữ liệu đối chiếu: một từ khóa trong tên sản phẩm đầu tiên đã click.
     const clicked = await browser.executeScript(() => {
       const links = Array.from(document.querySelectorAll('.product-list-filter a[href*=".html"], a[href*=".html"]'));
 
@@ -75,10 +81,13 @@ describe('TC06 - Xem chi tiết sản phẩm', function () {
       return false;
     });
 
+    // Kiểm tra: thao tác click sản phẩm phải thành công.
+    // Mong đợi: clicked = true.
     expect(clicked, 'Fail: click sản phẩm không mở được trang chi tiết').to.equal(true);
     await waitUntilReady();
     await hideCookieConsentIfPresent(browser);
 
+    // Dữ liệu kiểm tra lấy từ trang chi tiết: URL, tên, giá, ảnh, mô tả/thông số.
     const currentUrl = await browser.getCurrentUrl();
     const detail = await browser.executeScript(() => {
       const visible = (element) => {
@@ -102,7 +111,7 @@ describe('TC06 - Xem chi tiết sản phẩm', function () {
       };
     });
 
-    // Expected: mở đúng trang chi tiết, có tên, giá, ảnh, mô tả/thông số.
+    // Kiểm tra + mong đợi: mở đúng trang chi tiết, đúng sản phẩm, có giá, ảnh, mô tả/thông số.
     expect(currentUrl, 'Fail: click sản phẩm không chuyển sang URL chi tiết').to.match(/\.html/i);
     expect(detail.name.toLowerCase(), 'Fail: mở sai sản phẩm so với item đã click').to.include(expectedToken);
     expect(detail.name, 'Fail: trang chi tiết không phải sản phẩm ASUS Vivobook').to.match(/asus|vivobook/i);

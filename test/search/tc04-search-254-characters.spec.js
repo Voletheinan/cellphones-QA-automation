@@ -28,6 +28,7 @@ describe('TC04 - Tìm kiếm 254 ký tự', function () {
   });
 
   it('TC04 - Tìm kiếm 254 ký tự', async function () {
+    // Dữ liệu kiểm tra: chuỗi 254 ký tự để kiểm tra giới hạn ô tìm kiếm.
     const longKeyword = 'a'.repeat(254);
 
     // Precondition: đăng nhập đúng tài khoản trước khi kiểm tra chức năng chính.
@@ -54,6 +55,7 @@ describe('TC04 - Tìm kiếm 254 ký tự', function () {
 
     const body = await browser.wait(until.elementLocated(By.css('body')), DEFAULT_TIMEOUT);
     const text = await body.getText();
+    // Dữ liệu đối chiếu: trạng thái tải trang, nội dung trang và kích thước UI sau khi search.
     const health = await browser.executeScript(() => ({
       readyState: document.readyState,
       title: document.title,
@@ -63,7 +65,8 @@ describe('TC04 - Tìm kiếm 254 ký tự', function () {
       viewportWidth: window.innerWidth
     }));
 
-    // Expected: hệ thống vẫn phản hồi, không crash, có thể trả về rỗng.
+    // Kiểm tra: các expect bên dưới xác nhận hệ thống xử lý input dài ổn định.
+    // Mong đợi: hệ thống vẫn phản hồi, không crash, có thể trả về rỗng.
     expect(health.readyState, 'Fail: trang không phản hồi sau khi search 254 ký tự').to.match(/complete|interactive/);
     expect(health.bodyLength, 'Fail: trang trắng hoàn toàn sau khi search 254 ký tự').to.be.greaterThan(0);
     expect(`${health.title}\n${health.url}`, 'Fail: search 254 ký tự gây lỗi 500/server error').to.not.match(/500|server error/i);

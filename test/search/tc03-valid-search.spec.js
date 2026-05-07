@@ -31,7 +31,10 @@ describe('TC03 - Tìm kiếm hợp lệ', function () {
     // Precondition: đăng nhập đúng tài khoản trước khi kiểm tra chức năng chính.
     await loginDirect();
 
-    // Action: tìm kiếm keyword hợp lệ "Samsung Galaxy S26 12GB 256GB".
+    // Dữ liệu kiểm tra: keyword hợp lệ có sản phẩm liên quan.
+    const keyword = 'Samsung Galaxy S26 12GB 256GB';
+
+    // Action: tìm kiếm keyword hợp lệ trên ô search.
     await browser.get(BASE_URL);
     await waitUntilReady();
     await hideCookieConsentIfPresent(browser);
@@ -39,12 +42,12 @@ describe('TC03 - Tìm kiếm hợp lệ', function () {
     const input = await findVisibleElement(SEARCH_INPUT);
     await input.click();
     await input.clear();
-    await input.sendKeys('Samsung Galaxy S26 12GB 256GB', Key.ENTER);
+    await input.sendKeys(keyword, Key.ENTER);
 
     try {
       await browser.wait(until.urlContains('/catalogsearch/result'), 8000);
     } catch {
-      await browser.get(`${BASE_URL}/catalogsearch/result?q=${encodeURIComponent('Samsung Galaxy S26 12GB 256GB')}`);
+      await browser.get(`${BASE_URL}/catalogsearch/result?q=${encodeURIComponent(keyword)}`);
     }
 
     await waitUntilReady();
@@ -55,7 +58,9 @@ describe('TC03 - Tìm kiếm hợp lệ', function () {
     const text = await body.getText();
     const products = await getVisibleProductsDirect();
 
-    // Expected: trang kết quả có sản phẩm liên quan.
+    // Dữ liệu đối chiếu: URL kết quả, text trang và danh sách sản phẩm hiển thị.
+    // Kiểm tra: các expect bên dưới xác nhận search hợp lệ có kết quả liên quan.
+    // Mong đợi: trang kết quả có sản phẩm liên quan.
     expect(currentUrl, 'Fail: tìm kiếm hợp lệ nhưng không chuyển tới trang kết quả').to.include('/catalogsearch/result');
     expect(products.length, 'Fail: tìm kiếm Samsung Galaxy S26 12GB 256GB không có kết quả').to.be.greaterThan(0);
     expect(text.toLowerCase(), 'Fail: kết quả tìm kiếm không liên quan Samsung Galaxy S26').to.match(/samsung|galaxy|s26/);

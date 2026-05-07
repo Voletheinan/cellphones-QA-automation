@@ -34,7 +34,10 @@ describe('TC09 - Thêm vào giỏ', function () {
     await loginDirect();
     await clearCartDirect();
 
-    // Action: tìm Vòng đeo tay thông minh Huawei Band 11, mở chi tiết và thêm vào giỏ sau khi đã đăng nhập.
+    // Dữ liệu kiểm tra: sản phẩm Huawei Band 11 cần thêm vào giỏ.
+    const keyword = 'Vòng đeo tay thông minh Huawei Band 11';
+
+    // Action: tìm sản phẩm, mở chi tiết và thêm vào giỏ sau khi đã đăng nhập.
     await browser.get(BASE_URL);
     await waitUntilReady();
     await hideCookieConsentIfPresent(browser);
@@ -42,12 +45,12 @@ describe('TC09 - Thêm vào giỏ', function () {
     const input = await findVisibleElement(SEARCH_INPUT);
     await input.click();
     await input.clear();
-    await input.sendKeys('Vòng đeo tay thông minh Huawei Band 11', Key.ENTER);
+    await input.sendKeys(keyword, Key.ENTER);
 
     try {
       await browser.wait(until.urlContains('/catalogsearch/result'), 8000);
     } catch {
-      await browser.get(`${BASE_URL}/catalogsearch/result?q=${encodeURIComponent('Vòng đeo tay thông minh Huawei Band 11')}`);
+      await browser.get(`${BASE_URL}/catalogsearch/result?q=${encodeURIComponent(keyword)}`);
     }
 
     await waitUntilReady();
@@ -57,6 +60,8 @@ describe('TC09 - Thêm vào giỏ', function () {
     const productPrice = await getPrimaryProductPrice();
     const productName = (await browser.findElement(By.css('.box-product-name h1, h1')).getText()).trim();
 
+    // Kiểm tra: sản phẩm mở đúng và đọc được giá trước khi thêm vào giỏ.
+    // Mong đợi: tên có Huawei Band 11 và giá là số lớn hơn 0.
     expect(productName, 'Fail: mở sai sản phẩm sau khi tìm kiếm Huawei Band 11').to.match(/huawei.*band\s*11|band\s*11.*huawei/i);
     expect(productPrice, `Fail: không đọc được giá chính của ${productName}`).to.be.a('number').and.greaterThan(0);
 
@@ -78,7 +83,9 @@ describe('TC09 - Thêm vào giỏ', function () {
     const cartPrices = parseVndPrices(cartText);
     const quantity = await readVisibleQuantityDirect();
 
-    // Expected: sản phẩm xuất hiện trong giỏ, đúng giá và số lượng.
+    // Dữ liệu đối chiếu: text giỏ hàng, giá trong giỏ và số lượng sản phẩm.
+    // Kiểm tra: các expect bên dưới xác nhận thêm vào giỏ đúng sản phẩm.
+    // Mong đợi: sản phẩm xuất hiện trong giỏ, đúng giá và số lượng.
     expect(cartText.toLowerCase(), 'Fail: thêm giỏ nhưng không thấy sản phẩm Huawei Band 11 trong giỏ').to.include('huawei');
     expect(cartPrices, 'Fail: sản phẩm trong giỏ không hiển thị đúng giá').to.include(productPrice);
     expect(quantity === 1 || /\b1\b/.test(cartText), 'Fail: số lượng sản phẩm trong giỏ không phải 1').to.equal(true);

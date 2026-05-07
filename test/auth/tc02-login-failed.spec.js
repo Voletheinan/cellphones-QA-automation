@@ -37,6 +37,10 @@ describe('TC02 - Đăng nhập thất bại', function () {
   });
 
   it('TC02 - Đăng nhập thất bại', async function () {
+    // Dữ liệu kiểm tra: số điện thoại và mật khẩu sai.
+    const invalidIdentifier = '0123456789';
+    const invalidPassword = 'wrong_password_123';
+
     // Action: nhập email/số điện thoại hoặc password sai.
     await browser.get(`${SMEMBER_URL}/login`);
     await browser.wait(async () => {
@@ -48,17 +52,19 @@ describe('TC02 - Đăng nhập thất bại', function () {
     const passwordInput = await findVisibleElement(LOGIN_PASSWORD_INPUT);
 
     await identifierInput.clear();
-    await identifierInput.sendKeys('0123456789');
+    await identifierInput.sendKeys(invalidIdentifier);
     await passwordInput.clear();
-    await passwordInput.sendKeys('wrong_password_123');
+    await passwordInput.sendKeys(invalidPassword);
     await clickVisibleText(['^đăng\\s+nhập$', '^dang\\s+nhap$', 'login']);
     await browser.sleep(2500);
 
+    // Dữ liệu đối chiếu: URL hiện tại và nội dung thông báo trên form login.
     const currentUrl = await browser.getCurrentUrl();
     const body = await browser.wait(until.elementLocated(By.css('body')), DEFAULT_TIMEOUT);
     const text = await body.getText();
 
-    // Expected: có thông báo lỗi và vẫn chưa đăng nhập.
+    // Kiểm tra: các expect bên dưới xác nhận đăng nhập bị từ chối.
+    // Mong đợi: có thông báo lỗi và vẫn chưa đăng nhập.
     expect(currentUrl, 'Fail: tài khoản sai nhưng vẫn bị redirect như đã đăng nhập').to.include('/login');
     expect(text, 'Fail: đăng nhập sai nhưng không hiển thị thông báo lỗi').to.match(/sai|không đúng|không tồn tại|không hợp lệ|thất bại|vui lòng/i);
   });

@@ -9,6 +9,7 @@ import { getPersonalAccount } from '../../src/support/testData.js';
 const SEARCH_INPUT = 'input[data-slot="input"], input[placeholder*="muốn mua"], input[placeholder*="Bạn muốn mua"]';
 const LOGIN_IDENTIFIER_INPUT = 'input[type="email"], input[placeholder*="email"], input[placeholder*="Email"], input[placeholder*="số điện thoại"], input[placeholder*="Số điện thoại"], input[placeholder*="SĐT"], input[maxlength="10"], input[name*="email"], input[name*="phone"]';
 const LOGIN_PASSWORD_INPUT = 'input[type="password"], input[placeholder*="mật khẩu"], input[placeholder*="Mật khẩu"]';
+// Dữ liệu kiểm tra DDT: các keyword không tồn tại.
 const noResultSearchData = [
   'abcxyz123456',
   'zzzz_timkiemloi_987654'
@@ -33,6 +34,7 @@ describe('TC05 - Tìm kiếm không tồn tại', function () {
 
   noResultSearchData.forEach((keyword) => {
     it(`TC05 - DDT tìm kiếm không tồn tại: ${keyword}`, async function () {
+      // Dữ liệu kiểm tra: keyword hiện tại trong mảng noResultSearchData.
       // Precondition: đăng nhập đúng tài khoản trước khi kiểm tra chức năng chính.
       await loginDirect();
 
@@ -55,6 +57,7 @@ describe('TC05 - Tìm kiếm không tồn tại', function () {
       await waitUntilReady();
       await hideCookieConsentIfPresent(browser);
 
+      // Dữ liệu đối chiếu: text thông báo và danh sách sản phẩm đang hiển thị.
       const body = await browser.wait(until.elementLocated(By.css('body')), DEFAULT_TIMEOUT);
       const text = await body.getText();
       const products = await browser.executeScript(() => {
@@ -69,7 +72,8 @@ describe('TC05 - Tìm kiếm không tồn tại', function () {
         });
       });
 
-      // Expected: không có sản phẩm và có thông báo không tìm thấy.
+      // Kiểm tra: các expect bên dưới xác nhận keyword không tồn tại không trả sản phẩm.
+      // Mong đợi: không có sản phẩm và có thông báo không tìm thấy.
       expect(products.length, `Fail: keyword ${keyword} không tồn tại nhưng vẫn hiển thị sản phẩm`).to.equal(0);
       expect(text, `Fail: keyword ${keyword} không có sản phẩm nhưng thiếu thông báo không tìm thấy`).to.match(/không tìm thấy|khong tim thay|không có kết quả|khong co ket qua|0\s+sản phẩm/i);
     });

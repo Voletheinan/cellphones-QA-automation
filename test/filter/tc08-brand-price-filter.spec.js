@@ -26,15 +26,18 @@ describe('TC08 - Lọc iPhone theo Sẵn hàng', function () {
   it('TC08 - Lọc iPhone theo Sẵn hàng', async function () {
     await loginWithPersonalAccount(browser);
 
+    // Dữ liệu kiểm tra: danh mục Điện thoại, hãng iPhone/Apple và filter Sẵn hàng.
     await phoneFilterPage.openHome();
     await phoneFilterPage.openPhoneCategory();
     await phoneFilterPage.selectIphoneBrand();
     await phoneFilterPage.selectAvailableStock();
 
+    // Dữ liệu đối chiếu: URL sau lọc, danh sách sản phẩm và trạng thái active của filter.
     const currentUrl = await phoneFilterPage.currentUrl();
     const products = await phoneFilterPage.visibleProducts();
     const wrongBrandProducts = products.filter((product) => !/iphone|apple/i.test(product.name));
 
+    // Kiểm tra + mong đợi: URL có filter, có sản phẩm, đúng hãng và nút Sẵn hàng active.
     expect(currentUrl, 'Fail: chọn danh mục Điện thoại nhưng URL không cập nhật').to.include('/mobile');
     expect(currentUrl, 'Fail: chưa áp dụng filter Sẵn hàng vào URL').to.match(/stock_available_id=/i);
     expect(products.length, 'Fail: filter iPhone + Sẵn hàng không trả về sản phẩm').to.be.greaterThan(0);

@@ -30,6 +30,7 @@ describe('TC07 - Lọc theo danh mục', function () {
     // Precondition: đăng nhập đúng tài khoản trước khi kiểm tra chức năng chính.
     await loginDirect();
 
+    // Dữ liệu kiểm tra: danh mục Điện thoại trên menu trang chủ.
     // Action: vào trang chủ rồi chọn danh mục Điện thoại trên giao diện.
     await browser.get(BASE_URL);
     await waitUntilReady();
@@ -43,7 +44,9 @@ describe('TC07 - Lọc theo danh mục', function () {
     const products = await getVisibleProductsDirect();
     const productsOutsidePhoneCategory = products.filter((product) => /laptop|macbook|ipad|tablet|tai nghe|ốp|op lung|cáp|cap sac|sạc|sac/i.test(product.name));
 
-    // Expected: chỉ hiển thị sản phẩm thuộc danh mục điện thoại.
+    // Dữ liệu đối chiếu: URL danh mục, danh sách sản phẩm và sản phẩm sai danh mục nếu có.
+    // Kiểm tra: các expect bên dưới xác nhận lọc danh mục Điện thoại đúng.
+    // Mong đợi: chỉ hiển thị sản phẩm thuộc danh mục điện thoại.
     expect(currentUrl, 'Fail: chọn danh mục Điện thoại nhưng URL không cập nhật').to.include('/mobile');
     expect(products.length, 'Fail: lọc danh mục Điện thoại không hiển thị sản phẩm').to.be.greaterThan(0);
     expect(productsOutsidePhoneCategory, 'Fail: danh mục Điện thoại có sản phẩm ngoài danh mục').to.have.length(0);
